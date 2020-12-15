@@ -8,43 +8,55 @@ love.graphics.setDefaultFilter("nearest")
 -- Cette ligne permet de déboguer pas à pas dans ZeroBraneStudio
 if arg[#arg] == "-debug" then require("mobdebug").start() end
 
-local image
-local largeur
-local hauteur
-local imageX
-local imageY
-local vitesse
+heros = {}
+sprites = {}
+
+function creeSprite(pNomImage, pX, pY)
+    sprite = {}
+    sprite.x = pX
+    sprite.y = pY
+    sprite.image = love.graphics.newImage("images/"..pNomImage..".png")
+    sprite.l = sprite.image:getWidth()
+    sprite.h = sprite.image:getHeight()
+    table.insert(sprites, sprite)
+
+    return sprite
+end
 
 function love.load()
+
+    love.window.setMode(1024, 768)
+    love.window.setTitle("Mon super shooter !")
     largeur = love.graphics.getWidth()
     hauteur = love.graphics.getHeight()
 
-    imageX = 100
-    imageY = 100
-
-    vitesse = 3
-
-    image = love.graphics.newImage("images/heros.png")
+    heros = creeSprite("heros", largeur/2, hauteur/2)
+    heros.y = hauteur - heros.h*2
 end
   
 function love.update(dt)
-    imageX = imageX + vitesse
-    if imageX > largeur - image:getWidth()/2 and vitesse > 0 then
-        vitesse = -4
-    elseif imageX < 0 and vitesse < 0 then
-        vitesse = 4
+    if love.keyboard.isDown("right") and heros.x < largeur then
+        heros.x = heros.x + 10
+    end
+    if love.keyboard.isDown("left") and heros.x > 0 then
+        heros.x = heros.x - 10
+    end
+    if love.keyboard.isDown("down") and heros.y < hauteur then
+        heros.y = heros.y + 10
+    end
+    if love.keyboard.isDown("up") and heros.y > 0 then
+        heros.y = heros.y - 10
     end
 end
   
 function love.draw()
 
-    love.graphics.line(largeur/2, 0, largeur/2, hauteur)
-    love.graphics.line(0, hauteur/2, largeur, hauteur/2)
+    local n
 
-    local lHeros = image:getWidth()
-    local hHeros = image:getHeight()
-
-    love.graphics.draw(image,imageX,imageY,0,1,1,lHeros/2,hHeros/2)
+    for n=1,#sprites do
+        local s = sprites[n]
+        love.graphics.draw(s.image, s.x, s.y, 0, 2, 2, s.l/2,s.h/2)
+    end
 
 end
   
